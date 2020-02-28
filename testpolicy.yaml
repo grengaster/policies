@@ -1,17 +1,16 @@
 apiVersion: policy.mcm.ibm.com/v1alpha1
 kind: Policy
 metadata:
-  name: policy-auditpolicy-1
+  name: policy-role-1
   namespace: mcm-policies
   annotations:
-    policy.mcm.ibm.com/categories: PR.PT Protective Technology
-    policy.mcm.ibm.com/controls: PR.PT-1 Audit Logging
+    policy.mcm.ibm.com/categories: PR.AC Identity Management Authentication and Access Control
+    policy.mcm.ibm.com/controls: PR.AC-4 Access Control
     policy.mcm.ibm.com/standards: NIST-CSF
-    seed-generation: '6'
+    seed-generation: '3'
   finalizers:
     - propagator.finalizer.mcm.ibm.com
-  generation: 212
-  resourceVersion: '51493186'
+  generation: 187
 spec:
   complianceType: musthave
   disabled: false
@@ -20,28 +19,41 @@ spec:
       - kube-*
     include:
       - default
-  policy-templates:
-    - objectDefinition:
-        apiVersion: audit.policies.ibm.com/v1alpha1
-        kind: AuditPolicy
-        metadata:
-          name: policy-auditpolicy-1-example
-        spec:
-          clusterAuditPolicy:
-            auditPolicyRules:
-              auth-idp: validate
-              helmapi: ignore
-              kubernetes: ignore
-              platform-api: ignore
-              platform-identity-manager: validate
-              platform-identity-provider: validate
-              vulnerability-advisor: ignore
-          namespaceSelector:
-            exclude:
-              - kube-system
-            include:
-              - default
-              - kube-*
-          remediationAction: inform
-          severity: low
   remediationAction: inform
+  role-templates:
+    - apiVersion: roletemplate.mcm.ibm.com/v1alpha1
+      complianceType: musthave
+      metadata:
+        name: operator-role-policy
+      rules:
+        - complianceType: musthave
+          policyRule:
+            apiGroups:
+              - extensions
+              - apps
+            resources:
+              - deployments
+            verbs:
+              - get
+              - list
+              - watch
+              - create
+              - delete
+              - patch
+        - complianceType: mustnothave
+          policyRule:
+            apiGroups:
+              - core
+            resources:
+              - secrets
+            verbs:
+              - get
+              - list
+              - watch
+              - delete
+              - create
+              - update
+              - patch
+      selector:
+        matchLabels:
+          dev: 'true'
