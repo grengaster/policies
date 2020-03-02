@@ -1,59 +1,69 @@
-apiVersion: policy.mcm.ibm.com/v1alpha1
-kind: Policy
+apiVersion: app.ibm.com/v1alpha1
+kind: Deployable
 metadata:
-  name: policy-role-1
-  namespace: mcm-policies
   annotations:
-    policy.mcm.ibm.com/categories: PR.AC Identity Management Authentication and Access Control
-    policy.mcm.ibm.com/controls: PR.AC-4 Access Control
-    policy.mcm.ibm.com/standards: NIST-CSF
-    seed-generation: '3'
-  finalizers:
-    - propagator.finalizer.mcm.ibm.com
-  generation: 187
+    app.ibm.com/is-local-deployable: "true"
+    source: policyspace
+  name: gr-policy-test
+  namespace: policyspace
 spec:
-  complianceType: musthave
-  disabled: false
-  namespaces:
-    exclude:
-      - kube-*
-    include:
-      - default
-  remediationAction: inform
-  role-templates:
-    - apiVersion: roletemplate.mcm.ibm.com/v1alpha1
+  template:
+    apiVersion: policy.mcm.ibm.com/v1alpha1
+    kind: Policy
+    metadata:
+      name: policy-role-1
+      namespace: mcm-policies
+      annotations:
+        policy.mcm.ibm.com/categories: PR.AC Identity Management Authentication and Access Control
+        policy.mcm.ibm.com/controls: PR.AC-4 Access Control
+        policy.mcm.ibm.com/standards: NIST-CSF
+        seed-generation: '3'
+      finalizers:
+        - propagator.finalizer.mcm.ibm.com
+      generation: 187
+    spec:
       complianceType: musthave
-      metadata:
-        name: operator-role-policy
-      rules:
-        - complianceType: musthave
-          policyRule:
-            apiGroups:
-              - extensions
-              - apps
-            resources:
-              - deployments
-            verbs:
-              - get
-              - list
-              - watch
-              - create
-              - delete
-              - patch
-        - complianceType: mustnothave
-          policyRule:
-            apiGroups:
-              - core
-            resources:
-              - secrets
-            verbs:
-              - get
-              - list
-              - watch
-              - delete
-              - create
-              - update
-              - patch
-      selector:
-        matchLabels:
-          dev: 'true'
+      disabled: false
+      namespaces:
+        exclude:
+          - kube-*
+        include:
+          - default
+      remediationAction: inform
+      role-templates:
+        - apiVersion: roletemplate.mcm.ibm.com/v1alpha1
+          complianceType: musthave
+          metadata:
+            name: operator-role-policy
+          rules:
+            - complianceType: musthave
+              policyRule:
+                apiGroups:
+                  - extensions
+                  - apps
+                resources:
+                  - deployments
+                verbs:
+                  - get
+                  - list
+                  - watch
+                  - create
+                  - delete
+                  - patch
+            - complianceType: mustnothave
+              policyRule:
+                apiGroups:
+                  - core
+                resources:
+                  - secrets
+                verbs:
+                  - get
+                  - list
+                  - watch
+                  - delete
+                  - create
+                  - update
+                  - patch
+          selector:
+            matchLabels:
+              dev: 'true'
